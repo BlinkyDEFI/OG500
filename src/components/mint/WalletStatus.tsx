@@ -20,8 +20,7 @@ export const WalletStatus: React.FC<WalletStatusProps> = ({ connected }) => {
           </div>
           <div className="p-4 bg-gradient-to-r from-yellow-900/20 to-orange-900/20 rounded-md border border-yellow-600/50 shadow-lg shadow-yellow-600/10">
             <div className="flex items-center justify-center gap-2 mb-2">
-              <AlertTriangle className="w-4 h-4 text-yellow-400" />
-              <p className="text-sm font-medium text-yellow-300">
+                            <p className="text-sm font-medium text-yellow-300">
                 Wallet Compatibility Notice
               </p>
             </div>
