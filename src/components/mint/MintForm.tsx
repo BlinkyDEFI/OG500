@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -6,98 +7,23 @@ import { useToast } from "@/hooks/use-toast";
 
 interface MintFormProps {
   blinkyBalance: number | null;
-  onMintSingle: () => Promise<{ success: boolean; error?: string }>;
-  onMintComplete: (nftName: string) => void;
-  onUpdateBalance: () => Promise<void>;
+  onMint: (amount: number) => Promise<void>;
   status: string;
-  setStatus: (status: string) => void;
   itemsRedeemed: string;
   isLoading: boolean;
-  setIsLoading: (loading: boolean) => void;
 }
 
 export const MintForm: React.FC<MintFormProps> = ({ 
   blinkyBalance, 
-  onMintSingle,
-  onMintComplete,
-  onUpdateBalance,
-  status,
-  setStatus,
+  onMint, 
+  status, 
   itemsRedeemed,
-  isLoading,
-  setIsLoading
+  isLoading 
 }) => {
   const [mintAmount, setMintAmount] = useState(1);
-  const { toast } = useToast();
-
-  const costPerNft = Number(TOKEN_AMOUNT) / 1_000_000;
-
-  const handleMintClick = async () => {
-    if (mintAmount < 1 || mintAmount > 10) {
-      toast({
-        title: "Invalid Amount",
-        description: "Please select between 1-10 NFTs to mint",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    setIsLoading(true);
-    setStatus(`Starting mint process for ${mintAmount} NFT${mintAmount > 1 ? 's' : ''}...`);
-
-    for (let i = 1; i <= mintAmount; i++) {
-      try {
-        setStatus(`Minting NFT ${i} of ${mintAmount}... Please approve in your wallet.`);
-        
-        const result = await onMintSingle();
-        
-        if (result.success) {
-          setStatus(`✅ NFT ${i} of ${mintAmount} minted successfully!`);
-          
-          // Update balance after successful mint
-          await onUpdateBalance();
-          
-          // Show success for this mint
-          onMintComplete("Blinky OG VIP NFT");
-          
-          // Small delay between mints to prevent issues
-          if (i < mintAmount) {
-            await new Promise(resolve => setTimeout(resolve, 1000));
-          }
-        } else {
-          setStatus(`❌ Mint ${i} failed: ${result.error}`);
-          setIsLoading(false);
-          
-          toast({
-            title: "Mint Failed",
-            description: `NFT ${i}: ${result.error}`,
-            variant: "destructive",
-          });
-          return; // Stop the loop on error
-        }
-      } catch (error: any) {
-        console.error(`Mint ${i} error:`, error);
-        setStatus(`❌ Mint ${i} failed`);
-        setIsLoading(false);
-        
-        toast({
-          title: "Mint Failed",
-          description: `NFT ${i}: ${error.message || "Unknown error"}`,
-          variant: "destructive",
-        });
-        return; // Stop the loop on error
-      }
-    }
-
-    // All mints completed successfully
-    setIsLoading(false);
-    setStatus(`✅ All ${mintAmount} NFTs minted successfully!`);
-    
-    toast({
-      title: "Minting Complete!",
-      description: `Successfully minted all ${mintAmount} NFTs`,
-      duration: 5000,
-    });
+  
+  const handleMintClick = () => {
+    onMint(mintAmount);
   };
 
   return (
@@ -120,19 +46,20 @@ export const MintForm: React.FC<MintFormProps> = ({
           max={10}
           value={mintAmount}
           onChange={(e) => setMintAmount(Number(e.target.value))}
-          disabled={isLoading}
           className="w-20 text-center bg-gray-800 border-gray-700 text-white"
         />
       </div>
       
       {/* Cost display */}
       <div className="text-center text-green-400 text-sm">
-        Cost per mint: {costPerNft} BLINKY
+        Cost per mint: {Number(TOKEN_AMOUNT) / 1_000_000} BLINKY
       </div>
       
-      {/* Total cost display */}
-      <div className="text-center text-white text-sm">
-        Total cost: {(costPerNft * mintAmount).toFixed(2)} BLINKY
+      {/* Mint confirmation info */}
+      <div className="p-3 bg-gray-800 rounded-md border border-gray-700">
+        <p className="text-xs text-gray-400 text-center">
+          Each NFT requires individual wallet confirmation. Confirmations appear sequentially - if you don't see the next prompt, check your wallet notifications.
+        </p>
       </div>
       
       {/* Mint button */}
@@ -147,7 +74,7 @@ export const MintForm: React.FC<MintFormProps> = ({
       {/* Instructions */}
       <div className="p-3 bg-gray-800 rounded-md border border-gray-700">
         <p className="text-sm text-green-400">
-          Select the number of NFTs to mint (1-10). Each NFT will require wallet approval and will be minted individually.
+          Select the number of NFTs to mint (1-10) and click "Mint" to approve the transaction.
         </p>
       </div>
       
