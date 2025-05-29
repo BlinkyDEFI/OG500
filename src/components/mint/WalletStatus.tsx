@@ -15,10 +15,10 @@ export const WalletStatus: React.FC<WalletStatusProps> = ({ connected }) => {
       
       {!connected && (
         <div className="space-y-3">
-          <div className="text-center text-green-400 py-2">
+          <div className="text-center text-green-300 py-2">
             Connect your wallet to mint.
           </div>
-          <p className="text-sm text-amber-400/80 text-center leading-relaxed italic">
+          <p className="text-sm text-yellow-300/80 text-center leading-relaxed italic">
             Phantom and Solflare wallets have been tested. Other wallets may appear as options but are used at your own risk.
           </p>
         </div>
